@@ -1,21 +1,29 @@
-name: package addon
+
+name: Package Add-on
 
 on:
   release:
     types: [published]
 
-jobs:
-  zip-files:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: vimtor/action-zip@v1.3
-        with:
-          files: *.py
-          dest: LSExporter.zip
+permissions:
+  contents: write
 
-    publish:
-      uses: softprops/action-gh-release@v2
-      with:
-        files: LSExporter.zip
-        generate_release_notes: true
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Package add-on
+        run: |
+          zip LSExporter.zip *.py
+
+      - name: Upload ZIP to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: LSExporter.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
